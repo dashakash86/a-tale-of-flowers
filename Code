@@ -1,1 +1,173 @@
+#Load required packages
+
+  install.packages("Ecdat")
+  library(Ecdat)
+  library(dplyr)
+  library(MASS)
+  library(ACSWR)
+  library(bootstrap)
+  library(magrittr)
+  library(bbmle)
+
+
+# Inspect dataset and its distribution
+
+  data(iris)
+  hist(iris$Sepal.Width, breaks = 20)
+
+
+# Empirical Cumulative Distribution of 'Sepal Width'
+  sepal.width.ecdf <- ecdf(iris$Sepal.Width)
+  plot(sepal.width.ecdf)
+
+
+
+# Non-parametric bootstrap to estimate average sepal width
+
+theta_hat <- mean(iris$Sepal.Width)
+theta <- function(x){ mean(x) }
+theta.NonPboot <- bootstrap(iris$Sepal.Width, 3200, theta)
+ 
+  # Standard error from the botstrap vector
+  theta.NonPboot_se <- sd(theta.NonPboot$thetastar)
+
+  # Confidence intervals for our estimate
+  nonPbootstrap_CI <- c(theta_hat-2*theta.NonPboot_se,theta_hat+2*theta.NonPboot_se)
+  theta.NonPboot_se # 0.03468142
+
+   ## Normal Confidence Interval (95%)
+   normal.ci<-c(theta_hat-2*theta.NonPboot_se, theta_hat+2*theta.NonPboot_se)
+   # (2.986420 3.128246)
+
+   ## Pivotal Confidence Interval (95%)
+   pivotal.ci<-c(2*theta_hat-quantile(theta.NonPboot$thetastar,0.975), 
+                 2*theta_hat-quantile(theta.NonPboot$thetastar,0.025))
+   # (2.987333, 3.127333)
+
+   ## Quantile Confidence Interval (95%) 
+   quantile.ci<-quantile(theta.NonPboot$thetastar, c(0.025, 0.975))
+   # (2.987333, 3.127333)
+
+
+
+# Parametric methods for estimation of mean (MLE and Bootstrap)
+
+  set.seed(123)
+  m1 <- mle2(iris$Sepal.Width ~ dnorm(mean = mu, sd = sd), 
+             data = as.data.frame(iris$Sepal.Width), start = list(mu = 1, sd = 2)) 
+  coefficients(m1)
+
+  #Coefficients:
+  #  Estimate   Std. Error   z value      Pr(z)    
+  #  3.057333   0.035469    86.196   < 2.2e-16 ***
+  #  0.434410   0.025081    17.320   < 2.2e-16 ***
+
+  # Inspection of the asymptotic distribution of 'sepal width' with MLE as mean
+  par(mfrow=c(1,2))
+  hist(rnorm(1000, mle_mu, mle_sd), breaks=20)
+  hist(iris$Sepal.Width, breaks = 20)
+
+
+  #Parametric Boostrap
+  B <- 3000
+  n <- length(iris$Sepal.Width)
+  theta.hat <- function(x){ mean(x) }
+   
+  # Use of 'replicate' function instead of 'bootstrap' function 
+  boot.theta.hat <- replicate(B, theta.hat(rnorm(n, mean = mle_mu, sd = mle_sd) )) # Replicate Approach
+  para_se <- sd(boot.theta.hat)
+  #0.01007748
+
+
+
+# Hypothesis Testing (against null hypothesis of average seal width being 3.1)
+
+  mean_true <- 3
+  n <- 150
+  alpha <- 0.05
+  rejectnull_count <- 0
+  iterations <- 1000
+
+  # Wald statistic and p-value for the hypothesis test
+    for(i in 1:iterations){
+    X_data = rnorm(n,mle_mu,mle_sd)
+    wald_test = (mean(X_data)-mean_true) / sqrt(mean(X_data / n))
+
+      if (abs(wald_test) > qnorm (0.975, 0, 1)) {
+      rejectnull_count = rejectnull_count + 1
+    }
+    }
+  rejectnull_count
+
+
+  
+
+# Bayesian analysis to determine proportion of 'large flowers'
+
+  sum(iris$Sepal.Width >= 3.05)
+  N = 150
+  S = 67
+  alpha = 68
+  beta = 84
+
+  # Assumed prior as binomial (n = 150, p = 67)
+  # Posterior to be rbeta(2000, alpha = 135, beta = 167)
+    theta.posterior <- rbeta(2000, 68, 84)
+    post.mean <- mean(theta.posterior)
+    post.mean
+    # 0.4485742
+
+  #Bayesian posterior confidence interval 
+    quantile(theta.posterior, c(0.025, 0.975))
+    #    2.5%     97.5% 
+    # 0.3719891 0.5297938 
+
+
+
+# Chi-square test and p-value to determine proportion of large flowers across species
+
+  # Setosa
+  sep <- iris$Sepal.Width
+  setosa <- nrow(subset(iris, Sepal.Width >= 3.05 & Species == "setosa"))
+  setosa1 <- nrow(subset(iris, Species == "setosa"))
+  chi_set <- chisq.test(x = c(42, 8), p = c(0.4485, 0.5515))
+  
+  # Versicolor
+  vers <- nrow(subset(iris, Sepal.Width >= 3.05 & Species == "versicolor"))
+  vers1 <- nrow(subset(iris, Species == "versicolor"))
+  chi_ver <- chisq.test(x = c(8, 42), p = c(0.4485, 0.5515))
+  
+  # Virginica
+  virg <- nrow(subset(iris, Sepal.Width >= 3.05 & Species == "virginica"))
+  virg1 <- nrow(subset(iris, Species == "virginica"))
+  chi_vir <- chisq.test(x = c(17, 33), p = c(0.4485, 0.5515))
+  
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
