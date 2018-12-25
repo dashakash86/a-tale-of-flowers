@@ -75,8 +75,7 @@ Here we compute a non-parametric bootstrap to find the 3 types of C.Is for the m
     quantile.ci<-quantile(theta.NonPboot$thetastar, c(0.025, 0.975))
     # (2.987333, 3.127333)
 ```
-![1 1](https://user-images.githubusercontent.com/44213899/50417595-354dc700-07dc-11e9-9482-e47414aa0a39.png)
-
+*So we find that though all the three confidence intervals differ, they all do contain the plug-in estimate.
 
 ## Parametric Approach
 We were able to determine, from our academic research, that the sepal width in the flower population of the species concerned does follow a normal distribution. Also when we inspected the histogram for Sepal Width, we found that it was reasonably normal, as shown below. 
@@ -114,9 +113,7 @@ Therefore, in this section we did an MLE for the mean of Sepal Width, followed b
   para_se <- sd(boot.theta.hat)
   #0.01007748
 ```
-
-
-
+*We observe that parametric confidence interval does differ from the non-parametric confidence interval that we saw earlier. The parametric interval is somewhat narrower than the non-parametric one.
 
 
 
