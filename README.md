@@ -30,6 +30,53 @@ This study was done to demonstrate the application of various statistical method
 * and at last,  a Chi-square test to confirm the proportion of large flowers under each Species 
 
 
+## Empirical CDF of Sepal Width
+Assuming that the values we see in the data have equal probability mass (1/n), we calculated the CDF of that function. The empirical CDF for Sepal Width is shown below –
+
+```
+# Empirical Cumulative Distribution of 'Sepal Width'
+sepal.width.ecdf <- ecdf(iris$Sepal.Width)
+plot(sepal.width.ecdf)
+
+```
+![1](https://user-images.githubusercontent.com/44213899/50416782-4f38db00-07d7-11e9-989b-8fe6d6e96761.png)
+
+
+## Non-parametric approach to estimate average 'sepal width'
+Here we compute a non-parametric bootstrap to find the 3 types of C.Is for the mean Sepal Width.
+*	We found the plug-in estimate X-bar = 3.05733 from the sample data which is the mean Sepal Width.
+*	Then we bootstrapped to get the estimate of standard error for our estimate 
+*	Standard error from the bootstrap came to around 0.03468 and we computed the three kinds of confidence intervals
+
+```
+# Non-parametric bootstrap to estimate average sepal width
+
+  theta_hat <- mean(iris$Sepal.Width)
+  theta <- function(x){ mean(x) }
+  theta.NonPboot <- bootstrap(iris$Sepal.Width, 3200, theta)
+
+   # Standard error from the botstrap vector
+   theta.NonPboot_se <- sd(theta.NonPboot$thetastar)
+
+    # Confidence intervals for our estimate
+    nonPbootstrap_CI <- c(theta_hat-2*theta.NonPboot_se,theta_hat+2*theta.NonPboot_se)
+    theta.NonPboot_se # 0.03468142
+
+   ## Normal Confidence Interval (95%)
+   normal.ci<-c(theta_hat-2*theta.NonPboot_se, theta_hat+2*theta.NonPboot_se)
+   # (2.986420 3.128246)
+
+   ## Pivotal Confidence Interval (95%)
+   pivotal.ci<-c(2*theta_hat-quantile(theta.NonPboot$thetastar,0.975), 
+                 2*theta_hat-quantile(theta.NonPboot$thetastar,0.025))
+   # (2.987333, 3.127333)
+
+   ## Quantile Confidence Interval (95%) 
+   quantile.ci<-quantile(theta.NonPboot$thetastar, c(0.025, 0.975))
+   # (2.987333, 3.127333)
+```
+
+
 
 
 
