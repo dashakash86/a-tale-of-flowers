@@ -79,10 +79,14 @@ Here we compute a non-parametric bootstrap to find the 3 types of C.Is for the m
 
 
 ## Parametric Approach
-We were able to determine, from our academic research, that the sepal width in the flower population of the species concerned does follow a normal distribution. Also when we inspected the histogram for Sepal Width, we found that it was reasonably normal. Therefore, in this section we did an MLE for the mean of Sepal Width, followed by a parametric bootstrap to determine standard error and a 95% confidence interval. 
+We were able to determine, from our academic research, that the sepal width in the flower population of the species concerned does follow a normal distribution. Also when we inspected the histogram for Sepal Width, we found that it was reasonably normal, as shown below. 
+
+![2](https://user-images.githubusercontent.com/44213899/50417976-f882cf80-07dd-11e9-84ed-61078a1c55ec.png)
+
+Therefore, in this section we did an MLE for the mean of Sepal Width, followed by a parametric bootstrap to determine standard error and a 95% confidence interval. 
 
 ```
-# Parametric methods for estimation of mean (MLE and Bootstrap)
+# Parametric method for estimation of mean (MLE and Bootstrap)
 
   set.seed(123)
   m1 <- mle2(iris$Sepal.Width ~ dnorm(mean = mu, sd = sd), 
