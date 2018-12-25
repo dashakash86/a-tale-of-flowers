@@ -51,30 +51,69 @@ Here we compute a non-parametric bootstrap to find the 3 types of C.Is for the m
 ```
 # Non-parametric bootstrap to estimate average sepal width
 
-  theta_hat <- mean(iris$Sepal.Width)
-  theta <- function(x){ mean(x) }
-  theta.NonPboot <- bootstrap(iris$Sepal.Width, 3200, theta)
+    theta_hat <- mean(iris$Sepal.Width)
+    theta <- function(x){ mean(x) }
+    theta.NonPboot <- bootstrap(iris$Sepal.Width, 3200, theta)
 
-   # Standard error from the botstrap vector
-   theta.NonPboot_se <- sd(theta.NonPboot$thetastar)
+    # Standard error from the botstrap vector
+    theta.NonPboot_se <- sd(theta.NonPboot$thetastar)
 
     # Confidence intervals for our estimate
     nonPbootstrap_CI <- c(theta_hat-2*theta.NonPboot_se,theta_hat+2*theta.NonPboot_se)
     theta.NonPboot_se # 0.03468142
 
-   ## Normal Confidence Interval (95%)
-   normal.ci<-c(theta_hat-2*theta.NonPboot_se, theta_hat+2*theta.NonPboot_se)
-   # (2.986420 3.128246)
+    # Normal Confidence Interval (95%)
+    normal.ci<-c(theta_hat-2*theta.NonPboot_se, theta_hat+2*theta.NonPboot_se)
+    # (2.986420 3.128246)
 
-   ## Pivotal Confidence Interval (95%)
-   pivotal.ci<-c(2*theta_hat-quantile(theta.NonPboot$thetastar,0.975), 
+    ## Pivotal Confidence Interval (95%)
+    pivotal.ci<-c(2*theta_hat-quantile(theta.NonPboot$thetastar,0.975), 
                  2*theta_hat-quantile(theta.NonPboot$thetastar,0.025))
-   # (2.987333, 3.127333)
+    # (2.987333, 3.127333)
 
-   ## Quantile Confidence Interval (95%) 
-   quantile.ci<-quantile(theta.NonPboot$thetastar, c(0.025, 0.975))
-   # (2.987333, 3.127333)
+    # Quantile Confidence Interval (95%) 
+    quantile.ci<-quantile(theta.NonPboot$thetastar, c(0.025, 0.975))
+    # (2.987333, 3.127333)
 ```
+![1 1](https://user-images.githubusercontent.com/44213899/50417595-354dc700-07dc-11e9-9482-e47414aa0a39.png)
+
+
+## Parametric Approach
+We were able to determine, from our academic research, that the sepal width in the flower population of the species concerned does follow a normal distribution. Also when we inspected the histogram for Sepal Width, we found that it was reasonably normal. Therefore, in this section we did an MLE for the mean of Sepal Width, followed by a parametric bootstrap to determine standard error and a 95% confidence interval. 
+
+```
+# Parametric methods for estimation of mean (MLE and Bootstrap)
+
+  set.seed(123)
+  m1 <- mle2(iris$Sepal.Width ~ dnorm(mean = mu, sd = sd), 
+             data = as.data.frame(iris$Sepal.Width), start = list(mu = 1, sd = 2)) 
+  coefficients(m1)
+
+  #Coefficients:
+  #  Estimate   Std. Error   z value      Pr(z)    
+  #  3.057333   0.035469    86.196   < 2.2e-16 ***
+  #  0.434410   0.025081    17.320   < 2.2e-16 ***
+
+  # Inspection of the asymptotic distribution of 'sepal width' with MLE as mean
+  par(mfrow=c(1,2))
+  hist(rnorm(1000, mle_mu, mle_sd), breaks=20)
+  hist(iris$Sepal.Width, breaks = 20)
+
+
+  #Parametric Boostrap
+  B <- 3000
+  n <- length(iris$Sepal.Width)
+  theta.hat <- function(x){ mean(x) }
+   
+  # Use of 'replicate' function instead of 'bootstrap' function 
+  boot.theta.hat <- replicate(B, theta.hat(rnorm(n, mean = mle_mu, sd = mle_sd) ))
+  para_se <- sd(boot.theta.hat)
+  #0.01007748
+```
+
+
+
+
 
 
 
