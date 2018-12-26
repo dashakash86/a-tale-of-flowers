@@ -1,5 +1,5 @@
 # a-tale-of-flowers
-Apply statistical learning methods (Non-parametric, Parametric, Bayesian, Hypothesis Testing) to draw inferences 
+Apply statistical learning methods (Non-parametric, Parametric, Bayesian, Hypothesis Testing) to draw interesting inferences from the variable 'sepal width'. 
 
 ## Abstract
 This study was done to demonstrate the application of various statistical methods and tests using the iris dataset. Applying parametric, non-parametric, hypothesis testing, Bayesian, and chi-square approaches, this study provides interesting findings on the sepal width and various species of flowers in the 'iris' dataset. 
