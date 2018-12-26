@@ -117,6 +117,84 @@ Therefore, in this section we did an MLE for the mean of Sepal Width, followed b
 
 
 
+## Hypothesis Testing (via the Wald Statistic method)
+
+Here we test our initial Null hypothesis "Ho: true value of mean (Sepal width) is 3.1" against the Alternate hypothesis "Ha: mean(Sepal Width) is not equal to 3.1". We calculated the Wald Statistics and compared it against the Z values at a significance level (alpha) of 0.05.
+
+```
+# Hypothesis Testing
+  mean_true <- 3
+  n <- 150
+  alpha <- 0.05
+  rejectnull_count <- 0
+  iterations <- 1000
+
+  # Wald statistic and p-value for the hypothesis test
+  for(i in 1:iterations){
+  X_data = rnorm(n,mle_mu,mle_sd)
+  wald_test = (mean(X_data)-mean_true) / sqrt(mean(X_data / n))
+  
+    if (abs(wald_test) > qnorm (0.975, 0, 1)) {
+    rejectnull_count = rejectnull_count + 1
+  }
+  }
+  rejectnull_count
+```
+*Results: Only in 37(3.7%) out of 1000 cases values were found to be lying outside the 95% confidence interval range which means that we failed to reject the null hypothesis at a 95% confidence interval.
+
+
+## Bayesian Analysis
+
+*Problem statement*: To determine the proportion of large flowers and that of small flowers in the sample. We define a flower as large if it has a sepal width more than 3.05 and small otherwise. Therefore this becomes a series of Bernoulli and in total a Binomial distribution. We start with a prior of Beta(1, 1). And then we computed the posterior mean proportion and posterior confidence intervals.
+
+```
+# Bayesian analysis to determine proportion of 'large flowers'
+  N = 150
+  S = 67
+  alpha = 68
+  beta = 84
+
+  # Assumed prior as binomial (n = 150, p = 67)
+  # Posterior to be rbeta(2000, alpha = 135, beta = 167)
+  theta.posterior <- rbeta(2000, 68, 84)
+  post.mean <- mean(theta.posterior)
+  post.mean
+  # 0.4485742
+
+  quantile(theta.posterior, c(0.025, 0.975))
+  #    2.5%     97.5% 
+  # 0.3719891 0.5297938 
+```
+*Results: We find that the posterior mean proportion of large flowers comes to 0.4485. And the confidence interval does include 0.5. So, we infer that proportion of large flowers could be 0.5 as well.
+
+## Chi-square Analysis to verify proportion of large flowers across species
+*Problem Statement*: If you would remember, we talked in our introduction about our dataset having 3 different species of flowers - Setosa, Versicolor, and Virginica. Here we extend our results from Bayesian analysis with a Chi-square test to see whether or not the proportion of large flowers is the same (0.4485) in each individual species.
+
+```
+# Chi-square test and p-value to determine large flowers across the three species
+
+  # Setosa
+  sep <- iris$Sepal.Width
+  setosa <- nrow(subset(iris, Sepal.Width >= 3.05 & Species == "setosa"))
+  setosa1 <- nrow(subset(iris, Species == "setosa"))
+  chi_set <- chisq.test(x = c(42, 8), p = c(0.4485, 0.5515))
+  
+  # Versicolor
+  vers <- nrow(subset(iris, Sepal.Width >= 3.05 & Species == "versicolor"))
+  vers1 <- nrow(subset(iris, Species == "versicolor"))
+  chi_ver <- chisq.test(x = c(8, 42), p = c(0.4485, 0.5515))
+  
+  # Virginica
+  virg <- nrow(subset(iris, Sepal.Width >= 3.05 & Species == "virginica"))
+  virg1 <- nrow(subset(iris, Species == "virginica"))
+  chi_vir <- chisq.test(x = c(17, 33), p = c(0.4485, 0.5515))
+```
+*Results: We find that in Setosa and Versicolor we can reject the null hypothesis. However, in case of Virginica we have a p-value more than an alpha of 0.05, or even 0.10. So we conclude that for Virginica flowers, proportion of large flowers will be the same as that for the entire sample.
+
+
+
+
+
 
 
 
